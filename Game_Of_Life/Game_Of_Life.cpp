@@ -521,11 +521,11 @@ int main()
 					// Reconfirming window resizing to remove unexpected behaviour
 					GetWindowRect(console, &r);
 					MoveWindow(console, r.left, r.top, 1300, 800, TRUE);
-CONSOLE_CURSOR_INFO cursorInfo;
-        GetConsoleCursorInfo(hConsole, &cursorInfo);
-        cursorInfo.dwSize = 1;
-        cursorInfo.bVisible = FALSE;
-        SetConsoleCursorInfo(hConsole, &cursorInfo);
+					CONSOLE_CURSOR_INFO cursorInfo;
+					GetConsoleCursorInfo(hConsole, &cursorInfo);
+					cursorInfo.dwSize = 1;
+					cursorInfo.bVisible = FALSE;
+					SetConsoleCursorInfo(hConsole, &cursorInfo);
 
 					cout << " Save as: ";
 					string name;

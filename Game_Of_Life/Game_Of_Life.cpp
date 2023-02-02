@@ -3,9 +3,8 @@
 // Codeblocks with default GCC compiler is recommended for better performance
 
 // For codeblocks' default GCC compiler, comment this if compiling on Visual Studio
-#define _WIN32_WINNT 0x0500
+//#define _WIN32_WINNT 0x0500
 
-#include "pch.h"
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
@@ -32,7 +31,7 @@ RECT r;
 
 // For codeblocks' default GCC compiler, comment this entire section if compiling on Visual Studio
 // Section starts here
-typedef struct _CONSOLE_FONT_INFOEX
+/*typedef struct _CONSOLE_FONT_INFOEX
 {
     ULONG cbSize;
     DWORD nFont;
@@ -50,10 +49,17 @@ lpConsoleCurrentFontEx);
 #ifdef __cplusplus
 }
 #endif
-
+*/
 // Section ends here
 
 CONSOLE_FONT_INFOEX cfi;
+
+void setCursorPosition(int x, int y)
+{
+    std::cout.flush();
+    COORD coord = { (SHORT) x, (SHORT) y};
+    SetConsoleCursorPosition(hConsole, coord);
+}
 
 void print(world w)
 {
@@ -80,6 +86,47 @@ void print(world w)
 				else cout << u8"\u25A1";
 			}
 			cout << endl;
+		}
+	}
+}
+
+void print(world w, world p)
+{
+	int i = 0;
+	int j = 0;
+	if (!bckgrnd)
+	{
+		for (auto row : w)
+		{
+			for (auto cell : row)
+			{
+				if(cell == p[i][j++]) continue;
+				setCursorPosition(j, i);
+				if (cell == 1) cout << u8"\u25A0";
+				else cout << " ";
+				setCursorPosition(0, 0);
+			}
+			cout << endl;
+			i++;
+			j = 0;
+		}
+	}
+
+	else
+	{
+		for (auto row : w)
+		{
+			for (auto cell : row)
+			{
+				if(cell == p[i][j++]) continue;
+				setCursorPosition(j, i);
+				if (cell == 1) cout << u8"\u25A0";
+				else cout << u8"\u25A1";
+				setCursorPosition(0, 0);
+			}
+			cout << endl;
+			i++;
+			j = 0;
 		}
 	}
 }
@@ -192,22 +239,22 @@ void settings()
 	switch (choice)
 	{
 		case '1':
-		    cin.clear();
+		    	cin.clear();
 			background_type();
 			break;
 		case '2':
-		    cin.clear();
+		    	cin.clear();
 			change_color();
 			break;
 		case '3':
-		    cin.clear();
+		    	cin.clear();
 			change_speed();
 			break;
 		case '4':
-		    cin.clear();
+		    	cin.clear();
 			break;
 		default:
-		    cin.clear();
+		    	cin.clear();
 			break;
 	}
 }
@@ -225,14 +272,14 @@ void background_type()
 		case '1':
 			cin.clear();
 			bckgrnd = false;
-            break;
-        case '2':
-            cin.clear();
-            bckgrnd = true;
-            break;
-        default:
-            cin.clear();
-            break;
+            		break;
+		case '2':
+		    	cin.clear();
+		    	bckgrnd = true;
+		    	break;
+		default:
+		    	cin.clear();
+		    	break;
 	}
 	save_settings();
 	settings();
@@ -360,11 +407,12 @@ int main()
 	cfi.FontFamily = FF_DONTCARE;
 	cfi.FontWeight = FW_NORMAL;
 
+
 	// Comment this if compiling on visual studio
-	wcscpy(cfi.FaceName, L"Courier New");
+	//wcscpy(cfi.FaceName, L"Courier New");
 
 	// Uncomment this if compiling on visual studio
-	//wcscpy_s(cfi.FaceName, L"Courier New");
+	wcscpy_s(cfi.FaceName, L"Courier New");
 
 	load_settings();
 
@@ -396,9 +444,9 @@ int main()
 		}
 
 		else if (name == "exit")
-        {
+        	{
 			break;
-        }
+        	}
 
 		else if (name == "random")
 		{
@@ -415,10 +463,10 @@ int main()
 			name = "Patterns\\" + name;
 			ifstream state(name);
 			if (state)
-	        {
-				board = load_from_file(state);
-       		}
-            else
+			{
+					board = load_from_file(state);
+			}
+			else
 			{
 				continue;
 			}
@@ -430,6 +478,11 @@ int main()
 		// Reconfirming window resizing to remove unexpected behaviour
 		GetWindowRect(console, &r);
 		MoveWindow(console, r.left, r.top, 1300, 800, TRUE);
+		CONSOLE_CURSOR_INFO cursorInfo;
+		GetConsoleCursorInfo(hConsole, &cursorInfo);
+		cursorInfo.dwSize = 1;
+		cursorInfo.bVisible = FALSE;
+		SetConsoleCursorInfo(hConsole, &cursorInfo);
 
 		world next_board = next_state(board);
 		print(board);
@@ -448,7 +501,8 @@ int main()
 			     if (rb_delay % 4 == 0)
                          SetConsoleTextAttribute(hConsole, ((rand() % 14)));
 			}
-			print(next_board);
+			print(next_board, board);
+			board = next_board;
 			next_board = next_state(next_board);
 			if (_kbhit())
 			{
@@ -467,6 +521,11 @@ int main()
 					// Reconfirming window resizing to remove unexpected behaviour
 					GetWindowRect(console, &r);
 					MoveWindow(console, r.left, r.top, 1300, 800, TRUE);
+CONSOLE_CURSOR_INFO cursorInfo;
+        GetConsoleCursorInfo(hConsole, &cursorInfo);
+        cursorInfo.dwSize = 1;
+        cursorInfo.bVisible = FALSE;
+        SetConsoleCursorInfo(hConsole, &cursorInfo);
 
 					cout << " Save as: ";
 					string name;
@@ -533,7 +592,6 @@ int main()
 				}
 			}
 			Sleep(delay);
-			system("cls");
 		}
 	}
 }
